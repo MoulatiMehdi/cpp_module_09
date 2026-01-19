@@ -1,14 +1,6 @@
 #include "BitcoinExchange.hpp"
 #include <algorithm>
-#include <cctype>
-#include <cstddef>
-#include <cstdio>
-#include <cstring>
-#include <ctime>
-#include <exception>
 #include <fstream>
-#include <ios>
-#include <iosfwd>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -44,7 +36,7 @@ void BitcoinExchange::loadData(const std::string &filename)
     std::string   line;
 
     if (!ifs.is_open())
-        throw std::runtime_error("could not open file");
+        throw std::runtime_error("could not open file.");
 
     std::getline(ifs, line);
     while (std::getline(ifs, line))
@@ -54,13 +46,17 @@ void BitcoinExchange::loadData(const std::string &filename)
     }
 }
 
-void BitcoinExchange::evaluate(const std::string &filename)
+void BitcoinExchange::evaluate(int argc, const char **argv)
 {
-    std::ifstream ifs(filename.c_str());
+    std::ifstream ifs(argv[1]);
     std::string   line;
 
-    if (!ifs.is_open())
+    if (_data.empty())
+        throw std::runtime_error("database empty");
+    if (argc != 2)
         throw std::runtime_error("could not open file");
+    if (!ifs.is_open())
+        throw std::runtime_error("could not open file.");
 
     std::getline(ifs, line);
     while (std::getline(ifs, line))
@@ -69,17 +65,16 @@ void BitcoinExchange::evaluate(const std::string &filename)
         {
             value_type a = readline(line, '|');
             if (a.second < 0)
-                throw std::runtime_error("not a positive number");
+                throw std::runtime_error("not a positive number.");
             if (a.second > 1000)
-                throw std::runtime_error("too large number");
+                throw std::runtime_error("too large a number.");
+
             _Tp::iterator b =
                 std::lower_bound(_data.begin(), _data.end(), a, compare);
-            if (b == _data.end())
-                std::cout << "not found" << std::endl;
-            else
-                std::cout << a.first << " => " << a.second << " = "
-                          << b->second * a.second << " (" << b->first << ")"
-                          << std::endl;
+            if (b != _data.begin() && (b == _data.end() || a.first != b->first))
+                --b;
+            std::cout << a.first << " => " << a.second;
+            std::cout << " = " << b->second * a.second << std::endl;
         }
         catch (std::exception &e)
         {
@@ -90,23 +85,7 @@ void BitcoinExchange::evaluate(const std::string &filename)
 
 bool BitcoinExchange::compare(const value_type &a, const value_type &b)
 {
-    std::tm tm1 = {};
-    std::tm tm2 = {};
-    char    buff1[64];
-    char    buff2[64];
-
-    strptime(a.first.c_str(), "%Y-%m-%d", &tm1);
-    strptime(b.first.c_str(), "%Y-%m-%d", &tm2);
-
-    strftime(buff1, 64, "%Y-%m-%d", &tm1);
-    strftime(buff2, 64, "%Y-%m-%d", &tm2);
-
-    long la = tm1.tm_year * (32 * 31) + tm1.tm_mon * 32 + tm1.tm_mday;
-    long lb = tm2.tm_year * (32 * 31) + tm2.tm_mon * 32 + tm2.tm_mday;
-
-    std::cout << std::boolalpha << "is " << buff1 << " before " << buff2 << "? "
-              << (la < lb) << std::endl;
-    return la < lb && (lb > la);
+    return hashDate(a.first) < hashDate(b.first);
 }
 
 BitcoinExchange::value_type
@@ -130,6 +109,18 @@ BitcoinExchange::readline(const std::string &line, char c)
     if (!iss.eof())
         throw std::runtime_error("bad input => " + iss.str());
     return value_type(date, value);
+}
+
+long BitcoinExchange::hashDate(const std::string &str)
+{
+
+    std::tm tm1 = {};
+    char    buff1[64];
+
+    strptime(str.c_str(), "%Y-%m-%d", &tm1);
+    strftime(buff1, 64, "%Y-%m-%d", &tm1);
+
+    return tm1.tm_year * 10000 + tm1.tm_mon * 100 + tm1.tm_mday;
 }
 
 bool BitcoinExchange::formatDate(Key &str)

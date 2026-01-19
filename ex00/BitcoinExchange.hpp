@@ -18,12 +18,14 @@ class BitcoinExchange
 
     BitcoinExchange &operator=(const BitcoinExchange &other);
 
-    void        loadData(const std::string &name);
-    void        evaluate(const std::string &filename);
-    static bool compare(const value_type &a, const value_type &b);
+    void loadData(const std::string &name);
+    void evaluate(int argc, const char **argv);
 
+    static bool       compare(const value_type &a, const value_type &b);
     static value_type readline(const std::string &line, char c);
-    static bool       formatDate(std::string &str);
+
+    static long hashDate(const std::string &str);
+    static bool formatDate(std::string &str);
 
   private:
     _Tp _data;
