@@ -4,23 +4,18 @@
 class RPN
 {
   public:
-    typedef std::stack<int> _Tp;
+    typedef std::stack<long> Container;
 
-    static const char        EOI;
+    static long calculate(int argc, char **argv);
+
+  private:
     static const std::string OPERATORS;
 
     RPN();
-    RPN(int argc, char **argv);
     RPN(const RPN &other);
     ~RPN();
     RPN &operator=(const RPN &other);
 
-    void calculate();
-    bool isValid(char c);
-    bool isOperator(char c);
-    char  next();
-
-  private:
-    _Tp  _data;
-    long _result;
+    static bool isOperator(char c);
+    static void execute(Container &s, char op);
 };

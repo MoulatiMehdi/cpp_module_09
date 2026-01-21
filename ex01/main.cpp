@@ -1,17 +1,15 @@
 #include "RPN.hpp"
-#include <exception>
 #include <iostream>
 
 int main(int argc, char **argv)
 {
     try
     {
-        RPN rpn(argc, argv);
-        rpn.calculate();
+        std::cout << RPN::calculate(argc, argv) << std::endl;
     }
-    catch (std::exception &e)
+    catch (...)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "Error" << std::endl;
     }
     return 0;
 }
