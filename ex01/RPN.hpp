@@ -1,24 +1,26 @@
-
-#include <forward_list>
+#include <stack>
 #include <string>
 
 class RPN
 {
   public:
-    typedef std::forward_list<char> _Tp;
+    typedef std::stack<int> _Tp;
 
-    static const int         EOI;
-    static const std::string VALID_CHARS;
+    static const char        EOI;
+    static const std::string OPERATORS;
 
     RPN();
-    RPN(const std::string &str);
+    RPN(int argc, char **argv);
     RPN(const RPN &other);
     ~RPN();
     RPN &operator=(const RPN &other);
 
-    int  next();
+    void calculate();
     bool isValid(char c);
+    bool isOperator(char c);
+    char  next();
 
   private:
-    _Tp _data;
+    _Tp  _data;
+    long _result;
 };

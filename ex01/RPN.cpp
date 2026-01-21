@@ -1,27 +1,37 @@
 #include "RPN.hpp"
 #include <cctype>
+#include <cstring>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 
-const int         RPN::EOI    = -1;
-const std::string VALID_CHARS = "0123456789/*-+";
+const char        RPN::EOI       = -1;
+const std::string RPN::OPERATORS = "/*-+";
 
 RPN::RPN()
 {
 }
 
-RPN::RPN(const std::string &str)
+RPN::RPN(int argc, char **argv)
 {
-    std::string::const_iterator first = str.begin();
-    std::string::const_iterator last  = str.end();
+    if (argc != 2)
+        throw std::runtime_error("Error");
 
-    while (first < last)
+    std::string                   str   = argv[1];
+    std::string::reverse_iterator first = str.rbegin();
+    std::string::reverse_iterator last  = str.rend();
+
+    while (1)
     {
-        if (isValid(*first))
-            _data.push_front(*first);
+        if (last == first || !isValid(*first))
+            throw std::runtime_error("Error");
+        _data.push(*first);
+        ++first;
+        if (last == first)
+            break;
+        if (*first != ' ')
+            throw std::runtime_error("Error");
         first++;
-        if (*first != ' ' || *first != '\0')
-            throw std::runtime_error("");
     }
 }
 
@@ -42,16 +52,61 @@ RPN &RPN::operator=(const RPN &other)
     return *this;
 }
 
-int RPN::next()
+bool RPN::isValid(char c)
 {
+    return isOperator(c) || std::isdigit(c);
+}
+
+bool RPN::isOperator(char c)
+{
+    return OPERATORS.find(c) != std::string::npos;
+}
+
+char RPN::next()
+{
+    int c;
+
     if (_data.empty())
         return EOI;
-    char c = _data.front();
-    _data.pop_front();
+    c = _data.top();
+    _data.pop();
     return c;
 }
 
-bool RPN::isValid(char c)
+void RPN::calculate()
 {
-    return VALID_CHARS.find(c) != std::string::npos;
+    char rh;
+    char op;
+
+    _result = next();
+    if (!std::isdigit(_result))
+        throw std::runtime_error("Error");
+    _result -= '0';
+    while (!_data.empty())
+    {
+        rh = next();
+        op = next();
+
+        if (!std::isdigit(rh))
+            throw std::runtime_error("Error");
+        rh -= '0';
+        switch (op)
+        {
+            case '-':
+                _result -= rh;
+                break;
+            case '+':
+                _result += rh;
+                break;
+            case '*':
+                _result *= rh;
+                break;
+            case '/':
+                _result /= rh;
+                break;
+            default:
+                throw std::runtime_error("Error");
+        }
+    }
+    std::cout << _result << std::endl;
 }
