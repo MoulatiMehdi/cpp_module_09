@@ -1,4 +1,8 @@
+#ifndef PMERGE_ME_HPP
+#define PMERGE_ME_HPP
+#include <cstddef>
 #include <deque>
+#include <iostream>
 #include <ostream>
 #include <utility>
 #include <vector>
@@ -15,40 +19,43 @@ class PmergeMe
     typedef std::vector<Pair>                 VecPair;
 
     static void sort(int argc, char **argv);
-    static long jacob(int i);
-
-    PmergeMe();
 
   private:
+    PmergeMe();
     PmergeMe(const PmergeMe &other);
     ~PmergeMe();
 
     PmergeMe &operator=(const PmergeMe &other);
 
-    void static mergeSort(
-        VecPair &vec, VecPair::iterator first, VecPair::iterator last
-    );
-    static void insert(Vector &chain, VecPair &pairs);
-    static void prepare(VecPair &vec, int argc, char **argv);
+    static void prepare(std::vector<value_type> &vec, int argc, char **argv);
+    static void mergeInsertion(std::vector<value_type> &vec, size_t size = 1);
+    static void pairwize(Vector &vec, size_t size);
+    static void permute(Vector &vec, size_t size);
+    static void insertion(std::vector<Vector> &main, std::vector<Vector> &pend);
+    static void flat(Vector &vec, std::vector<Vector> &main, size_t size);
 
     template <typename T>
-    static bool cmp(const T &a, const T &b);
+    static bool greater(const T &a, const T &b);
 };
 
-std::ostream &operator<<(std::ostream &out, PmergeMe::VecPair &vec);
 std::ostream &operator<<(std::ostream &out, PmergeMe::Vector &vec);
+std::ostream &operator<<(std::ostream &out, std::vector<PmergeMe::Vector> &vec);
 
 template <typename T>
-bool PmergeMe::cmp(const T &a, const T &b)
+bool PmergeMe::greater(const T &a, const T &b)
 {
     PmergeMe::_nb_cmp++;
-    return a < b;
+    return a > b;
 }
 
 template <>
 inline bool
-PmergeMe::cmp<PmergeMe::Pair>(const PmergeMe::Pair &a, const PmergeMe::Pair &b)
+PmergeMe::greater<PmergeMe::Vector>(const Vector &a, const Vector &b)
 {
     PmergeMe::_nb_cmp++;
-    return a.first < b.first;
+    if (a.empty() || b.empty())
+        throw std::logic_error("Cannot compare empty vectors");
+    return *a.rbegin() < *b.rbegin();
 }
+
+#endif
