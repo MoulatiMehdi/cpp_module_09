@@ -3,24 +3,19 @@
 #include <cstddef>
 #include <deque>
 #include <iostream>
-#include <ostream>
-#include <utility>
 #include <vector>
 
 class PmergeMe
 {
   public:
-    static int _nb_cmp;
-
-    typedef int                               value_type;
-    typedef std::deque<value_type>            Deque;
-    typedef std::vector<value_type>           Vector;
-    typedef std::pair<value_type, value_type> Pair;
-    typedef std::vector<Pair>                 VecPair;
-
-    static void sort(int argc, char **argv);
+    typedef int                     value_type;
+    typedef std::deque<value_type>  Deque;
+    typedef std::vector<value_type> Vector;
+    static void                     sort(int argc, char **argv);
 
   private:
+    static int _nb_cmp;
+
     PmergeMe();
     PmergeMe(const PmergeMe &other);
     ~PmergeMe();
@@ -34,28 +29,18 @@ class PmergeMe
     static void insertion(std::vector<Vector> &main, std::vector<Vector> &pend);
     static void flat(Vector &vec, std::vector<Vector> &main, size_t size);
 
-    template <typename T>
-    static bool greater(const T &a, const T &b);
+    static void mergeInsertion(std::deque<value_type> &vec, size_t size = 1);
+    static void pairwize(Deque &vec, size_t size);
+    static void permute(Deque &vec, size_t size);
+    static void insertion(std::deque<Deque> &main, std::deque<Deque> &pend);
+    static void flat(Deque &vec, std::deque<Deque> &main, size_t size);
+
+    static bool greater(const value_type &a, const value_type &b);
+    static bool greater(const Vector &a, const Vector &b);
+    static bool greater(const Deque &a, const Deque &b);
 };
 
-std::ostream &operator<<(std::ostream &out, PmergeMe::Vector &vec);
-std::ostream &operator<<(std::ostream &out, std::vector<PmergeMe::Vector> &vec);
-
-template <typename T>
-bool PmergeMe::greater(const T &a, const T &b)
-{
-    PmergeMe::_nb_cmp++;
-    return a > b;
-}
-
-template <>
-inline bool
-PmergeMe::greater<PmergeMe::Vector>(const Vector &a, const Vector &b)
-{
-    PmergeMe::_nb_cmp++;
-    if (a.empty() || b.empty())
-        throw std::logic_error("Cannot compare empty vectors");
-    return *a.rbegin() < *b.rbegin();
-}
+std::ostream &operator<<(std::ostream &out, const PmergeMe::Vector &vec);
+std::ostream &operator<<(std::ostream &out, const PmergeMe::Deque &vec);
 
 #endif
