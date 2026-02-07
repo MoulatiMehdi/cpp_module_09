@@ -34,17 +34,12 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &)
     return *this;
 }
 
-void PmergeMe::sort(int argc, char **argv)
+void PmergeMe::sort(Vector &a)
 {
-    Vector    a;
-    Deque     b;
     long long start;
     long long end;
 
     _nb_cmp = 0;
-    prepare(a, argc, argv);
-
-    b.insert(b.end(), a.begin(), a.end());
 
     std::cout << "Before: " << a << std::endl;
     start = now_us();
@@ -55,6 +50,14 @@ void PmergeMe::sort(int argc, char **argv)
     std::cout << "Time to process a range of " << a.size()
               << " elements with std::vector : " << end - start << " us"
               << std::endl;
+}
+
+void PmergeMe::sort(Deque &b)
+{
+    long long start;
+    long long end;
+
+    _nb_cmp = 0;
 
     start = now_us();
     mergeInsertion(b);

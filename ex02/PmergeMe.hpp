@@ -11,25 +11,27 @@ class PmergeMe
     typedef int                     value_type;
     typedef std::deque<value_type>  Deque;
     typedef std::vector<value_type> Vector;
-    static void                     sort(int argc, char **argv);
 
-  private:
     static int _nb_cmp;
 
+    static void sort(Vector &a);
+    static void sort(Deque &a);
+    static void prepare(Vector &vec, int argc, char **argv);
+
+  private:
     PmergeMe();
     PmergeMe(const PmergeMe &other);
     ~PmergeMe();
 
     PmergeMe &operator=(const PmergeMe &other);
 
-    static void prepare(std::vector<value_type> &vec, int argc, char **argv);
-    static void mergeInsertion(std::vector<value_type> &vec, size_t size = 1);
+    static void mergeInsertion(Vector &vec, size_t size = 1);
     static void pairwize(Vector &vec, size_t size);
     static void permute(Vector &vec, size_t size);
     static void insertion(std::vector<Vector> &main, std::vector<Vector> &pend);
     static void flat(Vector &vec, std::vector<Vector> &main, size_t size);
 
-    static void mergeInsertion(std::deque<value_type> &vec, size_t size = 1);
+    static void mergeInsertion(Deque &vec, size_t size = 1);
     static void pairwize(Deque &vec, size_t size);
     static void permute(Deque &vec, size_t size);
     static void insertion(std::deque<Deque> &main, std::deque<Deque> &pend);

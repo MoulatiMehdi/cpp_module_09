@@ -6,7 +6,14 @@ int main(int argc, char *argv[])
 {
     try
     {
-        PmergeMe::sort(argc, argv);
+        PmergeMe::Vector a;
+        PmergeMe::Deque  b;
+
+        PmergeMe::prepare(a, argc, argv);
+        b.assign(a.begin(), a.end());
+
+        PmergeMe::sort(a);
+        PmergeMe::sort(b);
     }
     catch (std::exception &e)
     {
