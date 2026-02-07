@@ -71,6 +71,9 @@ void BitcoinExchange::evaluate(int argc, const char **argv)
 
             _Tp::iterator b =
                 std::lower_bound(_data.begin(), _data.end(), a, compare);
+
+            if (b == _data.begin() && a.first != b->first)
+                throw std::runtime_error("No date before " + a.first);
             if (b != _data.begin() && (b == _data.end() || a.first != b->first))
                 --b;
             std::cout << a.first << " => " << a.second;
@@ -135,10 +138,12 @@ bool BitcoinExchange::formatDate(Key &str)
     if (p == NULL || *p != '\0')
         return false;
     strftime(str1, 64, "%Y-%m-%d", &tm_1);
-    str  = str1;
-    tm_2 = tm_1;
+    str          = str1;
+    tm_2         = tm_1;
+    tm_2.tm_year = tm_1.tm_year % 400;
     if (mktime(&tm_2) == -1)
         return false;
+    tm_2.tm_year = tm_1.tm_year;
     strftime(str2, 64, "%Y-%m-%d", &tm_2);
     return str == str2;
 }
